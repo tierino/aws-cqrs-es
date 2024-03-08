@@ -1,0 +1,43 @@
+{
+  "name": "aws-cqrs-es",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "sst dev",
+    "build": "sst build",
+    "deploy": "sst deploy",
+    "remove": "sst remove",
+    "console": "sst console",
+    "typecheck": "tsc --noEmit",
+    "test:unit": "vitest",
+    "test:integration": "sst bind \"vitest run --dir tests/integration\"",
+    "test:integration:watch": "sst bind \"vitest watch --dir tests/integration\"",
+    "coverage": "vitest run --coverage",
+    "localstore:build": "tsc infra/mongo.ts --module nodenext --moduleResolution nodenext --outDir infra/dist",
+    "localstore:migrate": "pnpm run localstore:build && node infra/dist/mongo.js"
+  },
+  "devDependencies": {
+    "@tsconfig/node18": "^18.2.2",
+    "@types/aws-lambda": "^8.10.133",
+    "@types/http-errors": "^2.0.4",
+    "@types/node": "^20.11.17",
+    "@vitest/coverage-v8": "^1.2.2",
+    "aws-cdk-lib": "2.124.0",
+    "constructs": "10.3.0",
+    "mongodb": "^6.3.0",
+    "sst": "^2.40.1",
+    "typescript": "^5.3.3",
+    "vitest": "^1.2.2"
+  },
+  "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.515.0",
+    "@aws-sdk/client-sqs": "^3.515.0",
+    "@aws-sdk/lib-dynamodb": "^3.515.0",
+    "aws-xray-sdk": "^3.5.3",
+    "dynamodb-toolbox": "^0.9.2",
+    "http-errors": "^2.0.0",
+    "nanoid": "^5.0.5",
+    "valibot": "^0.28.1"
+  }
+}
