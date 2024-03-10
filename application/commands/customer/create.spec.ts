@@ -1,7 +1,7 @@
 import { store } from '@application/repositories/store'
 import { describe, it, vi, expect, beforeEach } from 'vitest'
 import { customerCommand } from '.'
-import { CommandError } from '@domain/command-error'
+import { CommandError } from '@application/repositories/store/command-error'
 import { domain } from '@domain/index'
 import { CreateCustomerProps } from './create'
 

@@ -2,7 +2,7 @@ import { describe, it, expect, vi } from 'vitest'
 import { db } from './client'
 import { MongoServerError } from 'mongodb'
 import { insertEvent } from './insert-event'
-import { DatabaseError } from '@domain/database-error'
+import { DatabaseError } from '@application/repositories/store/database-error'
 import { readCustomerStream } from './read-customer-stream'
 
 vi.mock('./client', () => ({

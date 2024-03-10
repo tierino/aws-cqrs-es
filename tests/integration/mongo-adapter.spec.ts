@@ -3,7 +3,7 @@ import { client, db } from '@adapters/secondary/store/client'
 import { StoreEvent } from '@domain/types'
 import { describe, it, expect, afterAll, beforeAll, afterEach } from 'vitest'
 import { Event } from '@domain/types'
-import { VersionConflictError } from '@domain/version-conflict-error'
+import { VersionConflictError } from '@application/repositories/store/version-conflict-error'
 
 const clearStore = async () => {
   await db.collection('events').deleteMany({})

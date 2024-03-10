@@ -1,16 +1,6 @@
 /** @todo clean up types */
-import { Event, EventMeta } from '@domain/types'
-import {
-  Aggregate,
-  AggregateMeta,
-  ApplyEvent,
-  ReadStream,
-  StoreEvent,
-} from './types'
-
-type GetAggregate<A extends Aggregate> = (
-  id: string
-) => Promise<A & AggregateMeta>
+import { Aggregate, AggregateMeta, Event, EventMeta } from '@domain/types'
+import { ApplyEvent, GetAggregate, ReadStream, StoreEvent } from './types'
 
 export type GetAggregateProps<A extends Aggregate, E extends Event> = {
   init: A

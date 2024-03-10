@@ -1,9 +1,10 @@
-import { Event, EventMeta } from '@domain/types'
-
-export type Aggregate = {}
-export type AggregateMeta = { aggregateId: string; version: number }
-
-export type Command = { type: string }
+import {
+  Aggregate,
+  AggregateMeta,
+  Command,
+  Event,
+  EventMeta,
+} from '@domain/types'
 
 export type CommandHandler<
   A extends Aggregate,
@@ -13,19 +14,16 @@ export type CommandHandler<
 
 export type StoreEvent<T = unknown> = EventMeta & { data: T }
 
+export type GetAggregate<A extends Aggregate> = (
+  id: string
+) => Promise<A & AggregateMeta>
+
 export type ReadStream<E extends Event> = (
   aggregateId: string,
   startPosition?: number
 ) => Promise<Array<StoreEvent<E>>>
 
 export type AppendEvent = (
-  event: Event,
-  aggregateId: string,
-  version: number
-) => Promise<void>
-
-/** @deprecated */
-export type PublishEvent = (
   event: Event,
   aggregateId: string,
   version: number

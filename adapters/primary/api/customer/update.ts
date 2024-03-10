@@ -1,4 +1,4 @@
-import { CommandError } from '@domain/command-error'
+import { CommandError } from '@application/repositories/store/command-error'
 import { customerCommand } from '@application/commands/customer'
 import { useBody, ApiHandler, usePathParam } from 'sst/node/api'
 import * as v from 'valibot'

@@ -1,8 +1,8 @@
-import { ReadStream } from '@application/repositories/types'
+import { ReadStream } from '@application/repositories/store/types'
 import { CustomerEvent } from '@domain/customer/types'
 import { db } from './client'
 import { StoreEvent } from '@domain/types'
-import { DatabaseError } from '@domain/database-error'
+import { DatabaseError } from '@application/repositories/store/database-error'
 
 export const readCustomerStream: ReadStream<CustomerEvent> = async (
   aggregateId

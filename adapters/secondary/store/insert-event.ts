@@ -1,9 +1,9 @@
 import { db } from './client'
 import { StoreEvent } from '@domain/types'
 import { MongoServerError } from 'mongodb'
-import { VersionConflictError } from '@domain/version-conflict-error'
-import { AppendEvent } from '@application/repositories/types'
-import { DatabaseError } from '@domain/database-error'
+import { VersionConflictError } from '@application/repositories/store/version-conflict-error'
+import { AppendEvent } from '@application/repositories/store/types'
+import { DatabaseError } from '@application/repositories/store/database-error'
 
 export const insertEvent: AppendEvent = async (event, aggregateId, version) => {
   const writable: StoreEvent<unknown> = {
@@ -20,7 +20,7 @@ export const insertEvent: AppendEvent = async (event, aggregateId, version) => {
       if (error.code === 11000) {
         throw new VersionConflictError()
       }
-      // todo
+      /** @todo better error handling */
       throw new DatabaseError('Unknown error')
     }
     throw new DatabaseError('Unknown error')

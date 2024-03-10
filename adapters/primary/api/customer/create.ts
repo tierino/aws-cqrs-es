@@ -1,5 +1,5 @@
 import { customerCommand } from '@application/commands/customer'
-import { CommandError } from '@domain/command-error'
+import { CommandError } from '@application/repositories/store/command-error'
 import { nanoid } from 'nanoid'
 import { useBody, ApiHandler } from 'sst/node/api'
 import * as v from 'valibot'

@@ -2,7 +2,7 @@ import { store } from '@application/repositories/store'
 import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { customerCommand } from '.'
 import { domain } from '@domain/index'
-import { CommandError } from '@domain/command-error'
+import { CommandError } from '@application/repositories/store/command-error'
 import { UpdateCustomerProps } from './update'
 
 vi.mock('@application/repositories/store', () => ({

@@ -1,5 +1,5 @@
 import { customerCommand } from '@application/commands/customer'
-import { CommandError } from '@domain/command-error'
+import { CommandError } from '@application/repositories/store/command-error'
 import { describe, it, vi, expect, beforeEach } from 'vitest'
 import { handler } from './create'
 import { APIGatewayProxyEventV2, Context } from 'aws-lambda'
