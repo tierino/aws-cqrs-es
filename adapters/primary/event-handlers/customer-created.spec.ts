@@ -3,17 +3,15 @@ import { handleEvent, lambdaHandler } from './customer-created'
 import { Context, SQSEvent, SQSRecord } from 'aws-lambda'
 import { nanoid } from 'nanoid'
 import { Event } from '@domain/types'
-import { projections } from '@application/repositories/projections'
 import { CustomerCreated } from '@domain/customer/types'
-import { MalformedEventError } from '@application/repositories/projections/malformed-event-error'
-import { InvalidEventError } from '@application/repositories/projections/invalid-event-error'
-import { ProjectionError } from '@application/repositories/projections/projection-error'
+import { MalformedEventError } from '@adapters/primary/event-handlers/malformed-event-error'
+import { InvalidEventError } from '@adapters/primary/event-handlers/invalid-event-error'
+import { EventHandlerError } from '@application/event-handlers/event-handler-error'
+import { eventHandlers } from '@application/event-handlers'
 
-vi.mock('@application/repositories/projections', () => ({
-  projections: {
-    customer: {
-      create: vi.fn(),
-    },
+vi.mock('@application/event-handlers', () => ({
+  eventHandlers: {
+    customerCreated: vi.fn(),
   },
 }))
 
@@ -52,9 +50,11 @@ describe('SQS event lambdaHandler primary adapter', () => {
     })
 
     describe('given an SQS record with a valid event', () => {
-      describe('and the repository call fails', () => {
+      describe('and the event handler fails', () => {
         it('throws a ProjectionError', async () => {
-          vi.mocked(projections.customer.create).mockRejectedValue(new Error())
+          vi.mocked(eventHandlers.customerCreated).mockRejectedValue(
+            new Error()
+          )
 
           const event: CustomerCreated = {
             type: 'CustomerCreated',
@@ -68,7 +68,9 @@ describe('SQS event lambdaHandler primary adapter', () => {
             body: JSON.stringify(event),
           } as SQSRecord
 
-          await expect(handleEvent(sqsRecord)).rejects.toThrow(ProjectionError)
+          await expect(handleEvent(sqsRecord)).rejects.toThrow(
+            EventHandlerError
+          )
         })
       })
     })
@@ -88,15 +90,15 @@ describe('SQS event lambdaHandler primary adapter', () => {
       Records: [sqsRecord],
     }
 
-    it('invokes the repository with the event', async () => {
+    it('invokes the event handler with the event', async () => {
       await lambdaHandler(sqsEvent)
 
-      expect(projections.customer.create).toHaveBeenCalledWith(event)
+      expect(eventHandlers.customerCreated).toHaveBeenCalledWith(event)
     })
 
-    describe('and the repository call fails', () => {
+    describe('and the event handler fails', () => {
       it('returns a Promise.allSettled() result containing a single "rejected" item', async () => {
-        vi.mocked(projections.customer.create).mockRejectedValue(new Error())
+        vi.mocked(eventHandlers.customerCreated).mockRejectedValue(new Error())
 
         await expect(lambdaHandler(sqsEvent)).resolves.toEqual([
           expect.objectContaining({ status: 'rejected' }),
@@ -104,9 +106,9 @@ describe('SQS event lambdaHandler primary adapter', () => {
       })
     })
 
-    describe('and the repository call succeeds', () => {
+    describe('and the event handler succeeds', () => {
       it('returns a Promise.allSettled() result containing a single "fulfilled" item with the messageId', async () => {
-        vi.mocked(projections.customer.create).mockResolvedValue()
+        vi.mocked(eventHandlers.customerCreated).mockResolvedValue()
 
         await expect(lambdaHandler(sqsEvent)).resolves.toEqual([
           {
@@ -130,10 +132,10 @@ describe('SQS event lambdaHandler primary adapter', () => {
       Records: [createSqsRecord(event)],
     }
 
-    it('does not invoke the repository', async () => {
+    it('does not invoke the event handler', async () => {
       await lambdaHandler(sqsEvent)
 
-      expect(projections.customer.create).not.toHaveBeenCalled()
+      expect(eventHandlers.customerCreated).not.toHaveBeenCalled()
     })
 
     it('returns a Promise.allSettled() result containing a single "rejected" item', async () => {
@@ -155,10 +157,10 @@ describe('SQS event lambdaHandler primary adapter', () => {
       ],
     } as SQSEvent
 
-    it('does not invoke the repository', async () => {
+    it('does not invoke the event handler', async () => {
       await lambdaHandler(sqsEvent)
 
-      expect(projections.customer.create).not.toHaveBeenCalled()
+      expect(eventHandlers.customerCreated).not.toHaveBeenCalled()
     })
 
     it('returns a Promise.allSettled() result containing a single "rejected" item', async () => {
@@ -202,23 +204,23 @@ describe('SQS event lambdaHandler primary adapter', () => {
       Records: [validSqsRecord1, validSqsRecord2, invalidSqsRecord],
     }
 
-    it('invokes the repository with only the valid events', async () => {
+    it('invokes the event handler with only the valid events', async () => {
       await lambdaHandler(sqsEvent)
 
-      expect(projections.customer.create).toHaveBeenNthCalledWith(
+      expect(eventHandlers.customerCreated).toHaveBeenNthCalledWith(
         1,
         validEvent1
       )
-      expect(projections.customer.create).toHaveBeenNthCalledWith(
+      expect(eventHandlers.customerCreated).toHaveBeenNthCalledWith(
         2,
         validEvent2
       )
       expect.assertions(2)
     })
 
-    describe('and all of the repository calls succeed', () => {
+    describe('and all of the event handlers succeed', () => {
       it('returns a Promise.allSettled() result containing a "fulfilled" item with the messageId for each valid event', async () => {
-        vi.mocked(projections.customer.create).mockResolvedValue()
+        vi.mocked(eventHandlers.customerCreated).mockResolvedValue()
 
         await expect(lambdaHandler(sqsEvent)).resolves.toEqual(
           expect.arrayContaining([
@@ -240,10 +242,10 @@ describe('SQS event lambdaHandler primary adapter', () => {
       })
     })
 
-    describe('and some of the repository calls fail', () => {
-      it('returns a Promise.allSettled() result containing a "fulfilled" item with the messageId only for events for which the repository call succeeded', async () => {
-        // Mock repository function to throw for only the first valid record
-        vi.mocked(projections.customer.create).mockImplementation(
+    describe('and some of the event handlers fail', () => {
+      it('returns a Promise.allSettled() result containing a "fulfilled" item with the messageId only for events for which the event handler succeeded', async () => {
+        // Mock event handler function to throw for only the first valid record
+        vi.mocked(eventHandlers.customerCreated).mockImplementation(
           async (event) => {
             if (event.id === validEvent1.id) {
               throw new Error()

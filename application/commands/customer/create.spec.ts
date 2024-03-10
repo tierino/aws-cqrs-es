@@ -1,11 +1,11 @@
-import { store } from '@application/repositories/store'
+import { store } from '@application/store'
 import { describe, it, vi, expect, beforeEach } from 'vitest'
 import { customerCommand } from '.'
-import { CommandError } from '@application/repositories/store/command-error'
+import { CommandError } from '@application/commands/command-error'
 import { domain } from '@domain/index'
 import { CreateCustomerProps } from './create'
 
-vi.mock('@application/repositories/store', () => ({
+vi.mock('@application/store', () => ({
   store: {
     append: vi.fn(),
     customer: {

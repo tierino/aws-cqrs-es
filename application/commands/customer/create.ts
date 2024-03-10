@@ -1,5 +1,5 @@
-import { store } from '@application/repositories/store'
-import { CommandError } from '@application/repositories/store/command-error'
+import { store } from '@application/store'
+import { CommandError } from '@application/commands/command-error'
 import { Customer, CustomerCreated } from '@domain/customer/types'
 
 export type CreateCustomerProps = Omit<Customer, 'id'>

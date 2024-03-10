@@ -1,11 +1,11 @@
 import { SQSEvent, SQSRecord } from 'aws-lambda'
 import middy from '@middy/core'
 import sqsBatch from '@middy/sqs-partial-batch-failure'
-import { projections } from '@application/repositories/projections'
 import * as v from 'valibot'
-import { ProjectionError } from '@application/repositories/projections/projection-error'
-import { MalformedEventError } from '@application/repositories/projections/malformed-event-error'
-import { InvalidEventError } from '@application/repositories/projections/invalid-event-error'
+import { EventHandlerError } from '@application/event-handlers/event-handler-error'
+import { MalformedEventError } from '@adapters/primary/event-handlers/malformed-event-error'
+import { InvalidEventError } from '@adapters/primary/event-handlers/invalid-event-error'
+import { eventHandlers } from '@application/event-handlers'
 
 const CustomerCreatedSchema = v.object({
   type: v.literal('CustomerCreated'),
@@ -20,7 +20,7 @@ export const handleEvent = async (record: SQSRecord) => {
     const parsed = JSON.parse(record.body)
     const event = v.parse(CustomerCreatedSchema, parsed)
 
-    await projections.customer.create(event)
+    await eventHandlers.customerCreated(event)
 
     return record
   } catch (error) {
@@ -33,7 +33,7 @@ export const handleEvent = async (record: SQSRecord) => {
     }
 
     if (error instanceof Error) {
-      throw new ProjectionError('CustomerCreated', error.message)
+      throw new EventHandlerError('CustomerCreated', error.message)
     }
   }
 }

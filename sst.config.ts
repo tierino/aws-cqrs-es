@@ -1,8 +1,8 @@
 import { SSTConfig } from 'sst'
-import { CommandApiStack } from './infra/command-api'
-import { EventStoreStack } from './infra/store'
-import { EventTopicStack } from './infra/event-topic'
-import { CustomerEventHandlerStack } from './infra/customer-event-handlers'
+import { CommandApiStack } from './infra/command/command-api'
+import { EventStoreStack } from './infra/command/store'
+import { EventTopicStack } from './infra/query/event-topic'
+import { CustomerEventHandlerStack } from './infra/query/customer-event-handlers'
 
 export default {
   config(_input) {

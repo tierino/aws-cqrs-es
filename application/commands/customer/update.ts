@@ -1,5 +1,5 @@
-import { store } from '@application/repositories/store'
-import { CommandError } from '@application/repositories/store/command-error'
+import { store } from '@application/store'
+import { CommandError } from '@application/commands/command-error'
 import { CustomerUpdated } from '@domain/customer/types'
 
 export type UpdateCustomerProps = {
