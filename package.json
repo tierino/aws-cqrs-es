@@ -14,8 +14,12 @@
     "test:integration": "sst bind \"vitest run --dir tests/integration\"",
     "test:integration:watch": "sst bind \"vitest watch --dir tests/integration\"",
     "coverage": "vitest run --coverage",
-    "localstore:build": "tsc infra/migrate.ts --module nodenext --moduleResolution nodenext --outDir infra/dist",
-    "localstore:migrate": "pnpm run localstore:build && node infra/dist/migrate.js"
+    "localstore:watch": "tsc --project infra/command/local-store --watch",
+    "localstore:build": "tsc --project infra/command/local-store",
+    "localstore:migrate": "node infra/command/local-store/dist/migrate.js",
+    "localbroker:watch": "tsc --project infra/query/local-broker --watch",
+    "localbroker:build": "tsc --project infra/query/local-broker",
+    "localbroker:run": "node infra/query/local-broker/dist/main.js"
   },
   "devDependencies": {
     "@tsconfig/node18": "^18.2.2",
