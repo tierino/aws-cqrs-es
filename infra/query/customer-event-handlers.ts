@@ -1,13 +1,20 @@
-import { Queue, StackContext, use } from 'sst/constructs'
+import { Function, Queue, StackContext, use } from 'sst/constructs'
 import { EventTopicStack } from './event-topic'
 import { aws_sns as sns } from 'aws-cdk-lib'
+import { ReadModelStack } from './read-model/table'
 
 export function CustomerEventHandlerStack({ stack }: StackContext) {
   const { topic } = use(EventTopicStack)
+  const { table, READ_MODEL_TABLE_NAME } = use(ReadModelStack)
+
+  /** @todo DLQ handlers */
+
+  /** CustomerCreated */
 
   const customerCreatedDlq = new Queue(stack, 'CustomerCreatedDlq', {
     cdk: { queue: { fifo: true } },
   })
+
   const customerCreatedQueue = new Queue(stack, 'CustomerCreated', {
     cdk: {
       queue: {
@@ -19,8 +26,14 @@ export function CustomerEventHandlerStack({ stack }: StackContext) {
       },
     },
   })
+
+  const customerCreatedHandler = new Function(stack, 'CustomerCreatedHandler', {
+    handler: 'adapters/primary/event-handlers/customer-created.handler',
+    bind: [table, READ_MODEL_TABLE_NAME],
+  })
+
   customerCreatedQueue.addConsumer(stack, {
-    function: 'adapters/primary/event-handlers/customer-created.handler',
+    function: customerCreatedHandler,
     cdk: {
       eventSource: {
         reportBatchItemFailures: true,
@@ -28,9 +41,12 @@ export function CustomerEventHandlerStack({ stack }: StackContext) {
     },
   })
 
+  /** CustomerUpdated */
+
   const customerUpdatedDlq = new Queue(stack, 'CustomerUpdatedDlq', {
     cdk: { queue: { fifo: true } },
   })
+
   const customerUpdatedQueue = new Queue(stack, 'CustomerUpdated', {
     cdk: {
       queue: {
@@ -42,8 +58,14 @@ export function CustomerEventHandlerStack({ stack }: StackContext) {
       },
     },
   })
+
+  const customerUpdatedHandler = new Function(stack, 'CustomerUpdatedHandler', {
+    handler: 'adapters/primary/event-handlers/customer-updated.handler',
+    bind: [table, READ_MODEL_TABLE_NAME],
+  })
+
   customerUpdatedQueue.addConsumer(stack, {
-    function: 'adapters/primary/event-handlers/customer-updated.handler',
+    function: customerUpdatedHandler,
     cdk: {
       eventSource: {
         reportBatchItemFailures: true,
@@ -51,9 +73,12 @@ export function CustomerEventHandlerStack({ stack }: StackContext) {
     },
   })
 
+  /** CustomerDeleted */
+
   const customerDeletedDlq = new Queue(stack, 'CustomerDeletedDlq', {
     cdk: { queue: { fifo: true } },
   })
+
   const customerDeletedQueue = new Queue(stack, 'CustomerDeleted', {
     cdk: {
       queue: {
@@ -65,16 +90,24 @@ export function CustomerEventHandlerStack({ stack }: StackContext) {
       },
     },
   })
+
+  const customerDeletedHandler = new Function(
+    stack,
+    'CustomerDeleteddHandler',
+    {
+      handler: 'adapters/primary/event-handlers/customer-deleted.handler',
+      bind: [table, READ_MODEL_TABLE_NAME],
+    }
+  )
+
   customerDeletedQueue.addConsumer(stack, {
-    function: 'adapters/primary/event-handlers/customer-deleted.handler',
+    function: customerDeletedHandler,
     cdk: {
       eventSource: {
         reportBatchItemFailures: true,
       },
     },
   })
-
-  /** @todo DLQ handlers */
 
   topic.addSubscribers(stack, {
     customerCreated: {

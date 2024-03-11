@@ -6,5 +6,6 @@ declare module 'sst/node/config' {
     STAGE: string
     CUSTOMER_COMMAND_API_URL: string
     EVENT_TOPIC_ARN: string
+    READ_MODEL_TABLE_NAME: string
   }
 }

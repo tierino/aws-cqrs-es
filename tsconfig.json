@@ -7,7 +7,7 @@
       "@domain/*": ["./domain/*"],
       "@application/*": ["./application/*"],
       "@adapters/*": ["./adapters/*"],
-      "@infra/*": ["./infra"]
+      "@infra/*": ["./infra/*"]
     }
   }
 }
